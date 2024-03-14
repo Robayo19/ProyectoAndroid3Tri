@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/formacion_433"
+        android:title="4-3-3" />
+    <item
+        android:id="@+id/formacion_442"
+        android:title="4-4-2" />
+    <item
+        android:id="@+id/formacion_343"
+        android:title="3-4-3" />
+</menu>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/degradado"
+    tools:context=".ui.friends.Friends">
+
+    <!-- TODO: Update blank fragment layout -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre">
+
+        <EditText
+            android:id="@+id/txt_nombrePersona"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:paddingTop="12dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Correo">
+
+        <EditText
+            android:id="@+id/txt_correoPersona"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:paddingTop="12dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Contraseña">
+
+        <EditText
+            android:id="@+id/txt_contrasenaPersona"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:paddingTop="12dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+    android:id="@+id/buttonFriends"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Accion a realizar"
+        android:background="@color/blue"
+    android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:text="Usuarios:"
+        android:textSize="30dp"
+        android:textStyle="bold" />
+
+
+    <ListView
+        android:id="@+id/listaDatos"
+        android:layout_width="wrap_content"
+        android:layout_height="392dp"
+        android:background="@color/white" />
+
+</LinearLayout>

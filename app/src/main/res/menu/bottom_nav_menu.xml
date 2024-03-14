@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/league"
+        android:title="@string/title_league" />
+
+    <item
+        android:id="@+id/navigation_equipo"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="@string/title_team" />
+    <item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/transferspng"
+        android:title="@string/title_Transfers" />
+    <item
+        android:id="@+id/navigation_friends"
+        android:icon="@drawable/friends"
+        android:title="@string/title_Friends" />
+
+
+</menu>

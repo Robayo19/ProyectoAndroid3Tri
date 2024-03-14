@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "813358115753",
+    "firebase_url": "https://tfgfantasy-b2139-default-rtdb.firebaseio.com",
+    "project_id": "tfgfantasy-b2139",
+    "storage_bucket": "tfgfantasy-b2139.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813358115753:android:8281f0c6baa468eb7c72b8",
+        "android_client_info": {
+          "package_name": "com.example.tfgpruebita"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbnri_ZPe0CZgplO9TuoZYI-5mZOvoQok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
