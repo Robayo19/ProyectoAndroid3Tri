@@ -1,7 +1,9 @@
 package com.example.tfgpruebita.ui.home;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,17 +16,23 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.tfgpruebita.MainActivity;
 import com.example.tfgpruebita.R;
 import com.example.tfgpruebita.databinding.FragmentHomeBinding;
 import com.example.tfgpruebita.ui.LoginRegister.Principal;
+import com.example.tfgpruebita.ui.equipo.Equipo_manage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import android.net.Uri;
 
 import org.w3c.dom.Text;
 
@@ -40,6 +48,10 @@ public class HomeFragment extends Fragment {
 
     private String correo;
 
+    ImageView ig_1;
+
+    ImageView ig_2;
+
     TextView textView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -48,9 +60,10 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         WebView webView = root.findViewById(R.id.webView);
-        webView.loadUrl("https://www.marca.com/");
+        webView.loadUrl("https://www.winsports.co/");
 
         Button btnCerrarSesion = root.findViewById(R.id.btnCerrarSesion);
+        Button btnSoporte = root.findViewById(R.id.btnSoporte);
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,6 +75,42 @@ public class HomeFragment extends Fragment {
                 getActivity().finish();
             }
         });
+
+        btnSoporte.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                builder.setMessage("Puedes mandar tus dudas/inquietudes y cualquier tipo de critica y/o aporte a fantasycafetero@gmail.com");
+                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
+            }
+        });
+
+        ig_1 = root.findViewById(R.id.ig_robayo);
+        ig_2 = root.findViewById(R.id.ig_jose);
+        ig_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "https://www.instagram.com/10_robayo_19/";
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+
+        ig_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "https://www.instagram.com/josee_12__/";
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+
         Bundle args = getArguments();
         if (args != null) {
             correo = args.getString("correo");
