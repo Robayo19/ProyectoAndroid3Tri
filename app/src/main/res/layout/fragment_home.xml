@@ -91,9 +91,11 @@
 
         <Button
             android:id="@+id/btnSoporte"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="214dp"
             android:layout_height="61dp"
             android:text="Soporte tecnico"
+            android:textColor="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
