@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +46,11 @@ public class Liga extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
+    private RecyclerView recyclerViewUsers;
+    private List<String> userList;
+    private UserAdapter userAdapter;
+
+
     private TextView textViewLeagueName;
     private Button buttonCreateLeague;
     private Button buttonJoinLeague;
@@ -52,6 +59,8 @@ public class Liga extends Fragment {
     private Button buttonCancel;
     private Button btnSalirLiga;
     private EditText editTextLeagueName;
+
+    private TextView textViewUserEmails;
 
     @Nullable
     @Override
@@ -68,6 +77,8 @@ public class Liga extends Fragment {
         buttonCancel = rootView.findViewById(R.id.btnCancel);
         btnSalirLiga = rootView.findViewById(R.id.btnSalirLiga);
         editTextLeagueName = rootView.findViewById(R.id.editTextLeagueName);
+        recyclerViewUsers = rootView.findViewById(R.id.textViewUserEmails);
+        recyclerViewUsers.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         verificarLigaUsuario();
 
@@ -98,7 +109,7 @@ public class Liga extends Fragment {
     }
 
     private void verificarLigaUsuario() {
-        String userId = mAuth.getCurrentUser().getUid();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         db.collection("ligas")
                 .whereArrayContains("usuarios_en_liga", userId)
                 .get()
@@ -111,7 +122,10 @@ public class Liga extends Fragment {
                             btnSalirLiga.setVisibility(View.VISIBLE);
                             buttonCreateLeague.setVisibility(View.INVISIBLE);
                             buttonJoinLeague.setVisibility(View.INVISIBLE);
+                            buttonAcept.setVisibility(View.INVISIBLE);
+                            buttonCancel.setVisibility(View.INVISIBLE);
                             List<String> usuariosEnLiga = (List<String>) document.get("usuarios_en_liga");
+                            Log.e("Lista ids pre", usuariosEnLiga.toString());
                             mostrarNombresUsuariosEnLiga(usuariosEnLiga);
                         } else {
                             textViewLeagueName.setText("No estás en ninguna liga");
@@ -122,48 +136,60 @@ public class Liga extends Fragment {
     }
 
     private void mostrarNombresUsuariosEnLiga(List<String> usuariosEnLiga) {
-        for (String userId : usuariosEnLiga) {
-            db.collection("usuario").document(userId)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            if (documentSnapshot.exists()) {
-                                String nombreUsuario = documentSnapshot.getString("nombre");
-                                if (nombreUsuario != null && !nombreUsuario.isEmpty()) {
-                                    textViewLeagueName.append("\n" + nombreUsuario);
-                                } else {
-                                    Log.e("Liga", "El nombre del usuario es nulo o vacío");
-                                }
-                            } else {
-                                Log.e("Liga", "El documento de usuario no existe");
-                            }
-                        } else {
-                            Log.e("Liga", "Error al obtener el documento de usuario: ", task.getException());
-                        }
-                    });
+        buttonAcept.setVisibility(View.INVISIBLE);
+        buttonCancel.setVisibility(View.INVISIBLE);
+        if (!usuariosEnLiga.isEmpty()) {
+            userList = new ArrayList<>(usuariosEnLiga);
+            userAdapter = new UserAdapter(userList);
+            recyclerViewUsers.setAdapter(userAdapter);
         }
     }
 
 
 
     private void crearLiga(String nombreLiga) {
-        String userId = mAuth.getCurrentUser().getUid();
+        buttonAcept.setVisibility(View.VISIBLE);
+        buttonCancel.setVisibility(View.VISIBLE);
+        buttonAcept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String ligaName = editTextLeagueName.getText().toString().trim();
+                if (!ligaName.isEmpty()) {
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-        Map<String, Object> ligaData = new HashMap<>();
-        ligaData.put("nombre", nombreLiga);
-        ligaData.put("creador", userId);
-        ligaData.put("usuarios_en_liga", Arrays.asList(userId));
-        db.collection("ligas").add(ligaData)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(requireContext(), "Liga creada exitosamente", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(requireContext(), "Error al crear la liga: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                    Map<String, Object> ligaData = new HashMap<>();
+                    ligaData.put("nombre", ligaName);
+                    ligaData.put("creador", userId);
+                    ligaData.put("usuarios_en_liga", Arrays.asList(userId));
+                    db.collection("ligas").add(ligaData)
+                            .addOnSuccessListener(documentReference -> {
+                                editTextLeagueName.setVisibility(View.INVISIBLE);
+                                Toast.makeText(requireContext(), "Liga creada exitosamente", Toast.LENGTH_SHORT).show();
+                                unirseALiga(ligaName);
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(requireContext(), "Error al crear la liga: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    Toast.makeText(requireContext(), "Por favor, ingrese un nombre para la liga", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editTextLeagueName.setVisibility(View.INVISIBLE);
+                buttonAcept.setVisibility(View.INVISIBLE);
+                buttonCancel.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void mostrarLigasDisponibles() {
+        buttonAcept.setVisibility(View.INVISIBLE);
+        buttonCancel.setVisibility(View.INVISIBLE);
+        editTextLeagueName.setVisibility(View.INVISIBLE);
         db.collection("ligas")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -188,7 +214,7 @@ public class Liga extends Fragment {
     }
 
     private void unirseALiga(String nombreLiga) {
-        String userId = mAuth.getCurrentUser().getUid();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
         db.collection("ligas").whereEqualTo("nombre", nombreLiga).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -204,6 +230,8 @@ public class Liga extends Fragment {
                                     btnSalirLiga.setVisibility(View.VISIBLE);
                                     buttonCreateLeague.setVisibility(View.INVISIBLE);
                                     buttonJoinLeague.setVisibility(View.INVISIBLE);
+                                    buttonAcept.setVisibility(View.INVISIBLE);
+                                    buttonCancel.setVisibility(View.INVISIBLE);
                                     mostrarNombresUsuariosEnLiga(Arrays.asList(userId));
                                 })
                                 .addOnFailureListener(e -> {
@@ -219,6 +247,8 @@ public class Liga extends Fragment {
     }
 
     private void salirDeLiga() {
+        buttonAcept.setVisibility(View.INVISIBLE);
+        buttonCancel.setVisibility(View.INVISIBLE);
         String userId = mAuth.getCurrentUser().getUid();
 
         db.collection("ligas")
