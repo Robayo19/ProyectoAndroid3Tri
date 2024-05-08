@@ -66,13 +66,14 @@ public class Registro extends AppCompatActivity {
         String nombre = nombreEditText.getText().toString().trim();
         String correo = correoEditText.getText().toString().trim();
         String contrasena = contrasenaEditText.getText().toString().trim();
+        String contrasenaEncriptada = Encriptar.hashString(contrasena);
 
-        mAuth.createUserWithEmailAndPassword(correo, contrasena)
+        mAuth.createUserWithEmailAndPassword(correo, contrasenaEncriptada)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            guardarUsuarioEnFirestore(nombre, correo, contrasena);
+                            guardarUsuarioEnFirestore(nombre, correo, contrasenaEncriptada);
                         } else {
                             Toast.makeText(Registro.this, "Error en el registro: " + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();

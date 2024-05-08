@@ -63,8 +63,9 @@ public class Login extends AppCompatActivity {
     private void iniciarSesion() {
         String correo = nombreLoginEditText.getText().toString().trim();
         String contrasena = contrasenaLoginEditText.getText().toString().trim();
+        String contrasenaEncriptada = Encriptar.hashString(contrasena);
 
-        mAuth.signInWithEmailAndPassword(correo, contrasena)
+        mAuth.signInWithEmailAndPassword(correo, contrasenaEncriptada)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -80,6 +81,6 @@ public class Login extends AppCompatActivity {
                         }
                     }
                 });
-    }
+        }
 
-}
+    }
