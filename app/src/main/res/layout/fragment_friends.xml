@@ -9,6 +9,14 @@
     tools:context=".ui.friends.Friends">
 
     <!-- TODO: Update blank fragment layout -->
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="188dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/blue"
+        android:text="Volver a Home" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,12 +58,12 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-    android:id="@+id/buttonFriends"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Accion a realizar"
+        android:id="@+id/buttonFriends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:background="@color/blue"
-    android:layout_gravity="center_horizontal" />
+        android:text="Accion a realizar" />
 
     <TextView
         android:layout_width="wrap_content"

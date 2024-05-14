@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
@@ -58,6 +59,8 @@ public class Friends extends Fragment {
     private EditText nombre, correo, contrasena;
     private ListView listViewUsuarios;
 
+    private Button btnBack;
+
     private FirebaseFirestore db;
 
     Persona personaSeleccionada;
@@ -73,10 +76,7 @@ public class Friends extends Fragment {
 
         String idUser = user.getUid();
 
-        if (!idUser.equals("6ylJgT6SE0hFXypAGxu8P6Bb2iL2")) {
-            NavHostFragment.findNavController(this).navigate(R.id.action_friends_to_homeFragment);
-        }
-
+        btnBack = binding.btnBack;
         nombre = binding.txtNombrePersona;
         correo = binding.txtCorreoPersona;
         contrasena = binding.txtContrasenaPersona;
@@ -85,6 +85,13 @@ public class Friends extends Fragment {
 
         inicializarFirestore();
         listarDatos();
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(v).navigate(R.id.navigation_home);
+            }
+        });
 
         listViewUsuarios.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

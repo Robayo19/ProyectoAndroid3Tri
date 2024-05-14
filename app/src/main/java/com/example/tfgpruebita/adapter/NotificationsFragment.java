@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tfgpruebita.R;
 import com.example.tfgpruebita.adapter.JugadorAdapter;
 import com.example.tfgpruebita.modelo.Jugador;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -54,7 +55,7 @@ public class NotificationsFragment extends Fragment {
 
         obtenerJugadoresDesdeFirestore();
 
-        jugadorAdapter = new JugadorAdapter(requireContext(), filteredJugadorList);
+        jugadorAdapter = new JugadorAdapter((List<DocumentSnapshot>) requireContext(), (JugadorAdapter.OnItemClickListener) filteredJugadorList);
         recyclerViewPlayers.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerViewPlayers.setAdapter(jugadorAdapter);
 

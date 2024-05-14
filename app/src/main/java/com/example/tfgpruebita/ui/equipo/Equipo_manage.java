@@ -3,10 +3,13 @@ package com.example.tfgpruebita.ui.equipo;
 import static com.google.common.reflect.Reflection.getPackageName;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.media.Image;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -23,6 +27,7 @@ import android.widget.Toast;
 
 import com.example.tfgpruebita.MainActivity;
 import com.example.tfgpruebita.R;
+import com.example.tfgpruebita.adapter.JugadorAdapter;
 import com.example.tfgpruebita.databinding.FragmentEquipoManageBinding;
 import com.example.tfgpruebita.modelo.Jugador;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -87,6 +92,12 @@ public class Equipo_manage extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Toast.makeText(requireContext(), "Para empezar, ¡elige la formación!", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -141,6 +152,21 @@ public class Equipo_manage extends Fragment {
         delantero2.setOnClickListener(v -> mostrarMenuDelanteros(v, txtdelantero2, delantero2));
         delantero3.setOnClickListener(v -> mostrarMenuDelanteros(v, txtdelantero3, delantero3));
 
+        portero.setEnabled(false);
+        defensa1.setEnabled(false);
+        defensa2.setEnabled(false);
+        defensa3.setEnabled(false);
+        defensa4.setEnabled(false);
+        defensa5.setEnabled(false);
+        medio1.setEnabled(false);
+        medio2.setEnabled(false);
+        medio3.setEnabled(false);
+        medio4.setEnabled(false);
+        medio5.setEnabled(false);
+        delantero1.setEnabled(false);
+        delantero2.setEnabled(false);
+        delantero3.setEnabled(false);
+
         listaJugadoresPartido.add(txtdelantero1);
         listaJugadoresPartido.add(txtdelantero2);
         listaJugadoresPartido.add(txtdelantero3);
@@ -172,6 +198,8 @@ public class Equipo_manage extends Fragment {
                 for (TextView txt : listaJugadoresPartido) {
                     if (!txt.getText().toString().equals("Elige")) {
                         listaJugaSimular.add(txt.getText().toString());
+                    } else {
+                        Toast.makeText(requireContext(), "No puedes guardar hasta tener todos los jugadores seleccionados", Toast.LENGTH_LONG).show();
                     }
                 }
                 MainActivity.lista = listaJugaSimular;
@@ -187,71 +215,84 @@ public class Equipo_manage extends Fragment {
                 .whereEqualTo("Posicion", "Delantero")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    PopupMenu popupMenu = new PopupMenu(requireContext(), v);
                     List<DocumentSnapshot> jugadoresList = queryDocumentSnapshots.getDocuments();
-                    Log.i("Equipo_manage", "Cantidad de jugadores: " + jugadoresList.size());
+                    Log.i("Equipo_manage", "Cantidad de delanteros: " + jugadoresList.size());
                     Collections.shuffle(jugadoresList);
                     List<DocumentSnapshot> jugadoresLimitados = jugadoresList.subList(0, Math.min(jugadoresList.size(), 5));
 
-                    for (DocumentSnapshot document : jugadoresLimitados) {
-                        String nombreJugador = document.getString("Nombre");
-                        if (nombreJugador != null) {
-                            popupMenu.getMenu().add(Menu.NONE, Menu.NONE, jugadoresList.indexOf(document), nombreJugador);
+                    Dialog dialog = new Dialog(requireContext());
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_custom_players);
+
+                    RecyclerView recyclerView = dialog.findViewById(R.id.recyclerViewPlayers);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+                    recyclerView.setLayoutManager(layoutManager);
+
+                    JugadorAdapter adapter = new JugadorAdapter(jugadoresLimitados, new JugadorAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(String nombreJugador, Dialog dialog) {
+                            textView.setText(nombreJugador);
+                            String nombreJugadorLower = nombreJugador.toLowerCase();
+                            int idDrawable = getResources().getIdentifier(nombreJugadorLower, "drawable", requireActivity().getPackageName());
+                            imageView.setImageResource(idDrawable);
+                            imageView.setEnabled(false);
+                            if (dialog != null) {
+                                dialog.dismiss();
+                            } else {
+                                Log.e("Equipo_manage", "El objeto Dialog es nulo en onItemClick");
+                            }
                         }
-                    }
-
-                    popupMenu.setOnMenuItemClickListener(item -> {
-                        String jugadorSeleccionado = item.getTitle().toString();
-                        textView.setText(jugadorSeleccionado);
-                        String nombreJugador = jugadorSeleccionado.toLowerCase();
-                        int idDrawable = getResources().getIdentifier(nombreJugador, "drawable", requireActivity().getPackageName());
-                        imageView.setImageResource(idDrawable);
-                        imageView.setEnabled(false);
-
-                        return true;
                     });
-                    Log.i("Equipo_manage", "Mostrando menú emergente");
-                    popupMenu.show();
+                    recyclerView.setAdapter(adapter);
+
+                    dialog.show();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Error", "Error al obtener jugadores: " + e.getMessage());
+                    Log.e("Error", "Error al obtener delanteros: " + e.getMessage());
                     e.printStackTrace();
                 });
     }
+
 
     private void mostrarMenuMedios(View v, TextView textView, ImageView imageView) {
         db.collection("jugadores")
                 .whereEqualTo("Posicion", "Mediocentro")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    PopupMenu popupMenu = new PopupMenu(requireContext(), v);
                     List<DocumentSnapshot> jugadoresList = queryDocumentSnapshots.getDocuments();
-                    Log.i("Equipo_manage", "Cantidad de jugadores: " + jugadoresList.size());
+                    Log.i("Equipo_manage", "Cantidad de delanteros: " + jugadoresList.size());
                     Collections.shuffle(jugadoresList);
                     List<DocumentSnapshot> jugadoresLimitados = jugadoresList.subList(0, Math.min(jugadoresList.size(), 5));
 
-                    for (DocumentSnapshot document : jugadoresLimitados) {
-                        String nombreJugador = document.getString("Nombre");
-                        if (nombreJugador != null) {
-                            popupMenu.getMenu().add(Menu.NONE, Menu.NONE, jugadoresList.indexOf(document), nombreJugador);
+                    Dialog dialog = new Dialog(requireContext());
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_custom_players);
+
+                    RecyclerView recyclerView = dialog.findViewById(R.id.recyclerViewPlayers);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+                    recyclerView.setLayoutManager(layoutManager);
+
+                    JugadorAdapter adapter = new JugadorAdapter(jugadoresLimitados, new JugadorAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(String nombreJugador, Dialog dialog) {
+                            textView.setText(nombreJugador);
+                            String nombreJugadorLower = nombreJugador.toLowerCase();
+                            int idDrawable = getResources().getIdentifier(nombreJugadorLower, "drawable", requireActivity().getPackageName());
+                            imageView.setImageResource(idDrawable);
+                            imageView.setEnabled(false);
+                            if (dialog != null) {
+                                dialog.dismiss();
+                            } else {
+                                Log.e("Equipo_manage", "El objeto Dialog es nulo en onItemClick");
+                            }
                         }
-                    }
-
-                    popupMenu.setOnMenuItemClickListener(item -> {
-                        String jugadorSeleccionado = item.getTitle().toString();
-                        textView.setText(jugadorSeleccionado);
-                        String nombreJugador = jugadorSeleccionado.toLowerCase();
-                        int idDrawable = getResources().getIdentifier(nombreJugador, "drawable", requireActivity().getPackageName());
-                        imageView.setImageResource(idDrawable);
-                        imageView.setEnabled(false);
-
-                        return true;
                     });
-                    Log.i("Equipo_manage", "Mostrando menú emergente");
-                    popupMenu.show();
+                    recyclerView.setAdapter(adapter);
+
+                    dialog.show();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Error", "Error al obtener jugadores: " + e.getMessage());
+                    Log.e("Error", "Error al obtener delanteros: " + e.getMessage());
                     e.printStackTrace();
                 });
     }
@@ -261,72 +302,83 @@ public class Equipo_manage extends Fragment {
                 .whereEqualTo("Posicion", "Defensa")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    PopupMenu popupMenu = new PopupMenu(requireContext(), v);
                     List<DocumentSnapshot> jugadoresList = queryDocumentSnapshots.getDocuments();
-                    Log.i("Equipo_manage", "Cantidad de jugadores: " + jugadoresList.size());
+                    Log.i("Equipo_manage", "Cantidad de delanteros: " + jugadoresList.size());
                     Collections.shuffle(jugadoresList);
                     List<DocumentSnapshot> jugadoresLimitados = jugadoresList.subList(0, Math.min(jugadoresList.size(), 5));
 
-                    for (DocumentSnapshot document : jugadoresLimitados) {
-                        String nombreJugador = document.getString("Nombre");
-                        if (nombreJugador != null) {
-                            popupMenu.getMenu().add(Menu.NONE, Menu.NONE, jugadoresList.indexOf(document), nombreJugador);
+                    Dialog dialog = new Dialog(requireContext());
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_custom_players);
+
+                    RecyclerView recyclerView = dialog.findViewById(R.id.recyclerViewPlayers);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+                    recyclerView.setLayoutManager(layoutManager);
+
+                    JugadorAdapter adapter = new JugadorAdapter(jugadoresLimitados, new JugadorAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(String nombreJugador, Dialog dialog) {
+                            textView.setText(nombreJugador);
+                            String nombreJugadorLower = nombreJugador.toLowerCase();
+                            int idDrawable = getResources().getIdentifier(nombreJugadorLower, "drawable", requireActivity().getPackageName());
+                            imageView.setImageResource(idDrawable);
+                            imageView.setEnabled(false);
+                            if (dialog != null) {
+                                dialog.dismiss();
+                            } else {
+                                Log.e("Equipo_manage", "El objeto Dialog es nulo en onItemClick");
+                            }
                         }
-                    }
-
-                    popupMenu.setOnMenuItemClickListener(item -> {
-                        String jugadorSeleccionado = item.getTitle().toString();
-                        textView.setText(jugadorSeleccionado);
-                        String nombreJugador = jugadorSeleccionado.toLowerCase();
-                        int idDrawable = getResources().getIdentifier(nombreJugador, "drawable", requireActivity().getPackageName());
-                        imageView.setImageResource(idDrawable);
-                        imageView.setEnabled(false);
-
-                        return true;
                     });
-                    Log.i("Equipo_manage", "Mostrando menú emergente");
-                    popupMenu.show();
+                    recyclerView.setAdapter(adapter);
+
+                    dialog.show();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Error", "Error al obtener jugadores: " + e.getMessage());
+                    Log.e("Error", "Error al obtener delanteros: " + e.getMessage());
                     e.printStackTrace();
                 });
     }
 
     private void mostrarMenuPorteros(View v, TextView txtportero, ImageView imageView) {
-
         db.collection("jugadores")
                 .whereEqualTo("Posicion", "Portero")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    PopupMenu popupMenu = new PopupMenu(requireContext(), v);
                     List<DocumentSnapshot> jugadoresList = queryDocumentSnapshots.getDocuments();
-                    Log.i("Equipo_manage", "Cantidad de jugadores: " + jugadoresList.size());
+                    Log.i("Equipo_manage", "Cantidad de delanteros: " + jugadoresList.size());
                     Collections.shuffle(jugadoresList);
                     List<DocumentSnapshot> jugadoresLimitados = jugadoresList.subList(0, Math.min(jugadoresList.size(), 5));
 
-                    for (DocumentSnapshot document : jugadoresLimitados) {
-                        String nombreJugador = document.getString("Nombre");
-                        if (nombreJugador != null) {
-                            popupMenu.getMenu().add(Menu.NONE, Menu.NONE, jugadoresList.indexOf(document), nombreJugador);
+                    Dialog dialog = new Dialog(requireContext());
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_custom_players);
+
+                    RecyclerView recyclerView = dialog.findViewById(R.id.recyclerViewPlayers);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+                    recyclerView.setLayoutManager(layoutManager);
+
+                    JugadorAdapter adapter = new JugadorAdapter(jugadoresLimitados, new JugadorAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(String nombreJugador, Dialog dialog) {
+                            txtportero.setText(nombreJugador);
+                            String nombreJugadorLower = nombreJugador.toLowerCase();
+                            int idDrawable = getResources().getIdentifier(nombreJugadorLower, "drawable", requireActivity().getPackageName());
+                            imageView.setImageResource(idDrawable);
+                            imageView.setEnabled(false);
+                            if (dialog != null) {
+                                dialog.dismiss();
+                            } else {
+                                Log.e("Equipo_manage", "El objeto Dialog es nulo en onItemClick");
+                            }
                         }
-                    }
-
-                    popupMenu.setOnMenuItemClickListener(item -> {
-                        String jugadorSeleccionado = item.getTitle().toString();
-                        txtportero.setText(jugadorSeleccionado);
-                        String nombreJugador = jugadorSeleccionado.toLowerCase();
-                        int idDrawable = getResources().getIdentifier(nombreJugador, "drawable", requireActivity().getPackageName());
-                        imageView.setImageResource(idDrawable);
-                        imageView.setEnabled(false);
-
-                        return true;
                     });
-                    Log.i("Equipo_manage", "Mostrando menú emergente");
-                    popupMenu.show();
+                    recyclerView.setAdapter(adapter);
+
+                    dialog.show();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Error", "Error al obtener jugadores: " + e.getMessage());
+                    Log.e("Error", "Error al obtener delanteros: " + e.getMessage());
                     e.printStackTrace();
                 });
     }
@@ -347,16 +399,61 @@ public class Equipo_manage extends Fragment {
                         Toast.makeText(requireContext(), "FORMACION ELEGIDA!", Toast.LENGTH_SHORT).show();
                         ajustarMargenesFormacion433();
                         button.setText("4-3-3");
+                        button.setEnabled(false);
+                        portero.setEnabled(true);
+                        defensa1.setEnabled(true);
+                        defensa2.setEnabled(true);
+                        defensa3.setEnabled(true);
+                        defensa4.setEnabled(true);
+                        defensa5.setEnabled(true);
+                        medio1.setEnabled(true);
+                        medio2.setEnabled(true);
+                        medio3.setEnabled(true);
+                        medio4.setEnabled(true);
+                        medio5.setEnabled(true);
+                        delantero1.setEnabled(true);
+                        delantero2.setEnabled(true);
+                        delantero3.setEnabled(true);
                         return true;
                     case FORMACION_442:
                         Toast.makeText(requireContext(), "FORMACION ELEGIDA!", Toast.LENGTH_SHORT).show();
                         ajustarMargenesFormacion442();
                         button.setText("4-4-2");
+                        button.setEnabled(false);
+                        portero.setEnabled(true);
+                        defensa1.setEnabled(true);
+                        defensa2.setEnabled(true);
+                        defensa3.setEnabled(true);
+                        defensa4.setEnabled(true);
+                        defensa5.setEnabled(true);
+                        medio1.setEnabled(true);
+                        medio2.setEnabled(true);
+                        medio3.setEnabled(true);
+                        medio4.setEnabled(true);
+                        medio5.setEnabled(true);
+                        delantero1.setEnabled(true);
+                        delantero2.setEnabled(true);
+                        delantero3.setEnabled(true);
                         return true;
                     case FORMACION_343:
                         Toast.makeText(requireContext(), "FORMACION ELEGIDA!", Toast.LENGTH_SHORT).show();
                         ajustarMargenesFormacion343();
                         button.setText("3-4-3");
+                        button.setEnabled(false);
+                        portero.setEnabled(true);
+                        defensa1.setEnabled(true);
+                        defensa2.setEnabled(true);
+                        defensa3.setEnabled(true);
+                        defensa4.setEnabled(true);
+                        defensa5.setEnabled(true);
+                        medio1.setEnabled(true);
+                        medio2.setEnabled(true);
+                        medio3.setEnabled(true);
+                        medio4.setEnabled(true);
+                        medio5.setEnabled(true);
+                        delantero1.setEnabled(true);
+                        delantero2.setEnabled(true);
+                        delantero3.setEnabled(true);
                         return true;
                     default:
                         return false;
@@ -394,6 +491,9 @@ public class Equipo_manage extends Fragment {
         txtdefensa1.setVisibility(View.VISIBLE);
         txtdefensa4.setVisibility(View.VISIBLE);
         txtdefensa5.setVisibility(View.INVISIBLE);
+        listaJugadoresPartido.remove(txtmedio5);
+        listaJugadoresPartido.remove(txtmedio4);
+        listaJugadoresPartido.remove(txtdefensa5);
     }
 
     private void ajustarMargenesFormacion442() {
@@ -423,6 +523,9 @@ public class Equipo_manage extends Fragment {
         txtdefensa1.setVisibility(View.VISIBLE);
         txtdefensa4.setVisibility(View.VISIBLE);
         txtdefensa5.setVisibility(View.INVISIBLE);
+        listaJugadoresPartido.remove(txtdelantero2);
+        listaJugadoresPartido.remove(txtmedio1);
+        listaJugadoresPartido.remove(txtdefensa5);
     }
 
     private void ajustarMargenesFormacion343() {
@@ -452,6 +555,9 @@ public class Equipo_manage extends Fragment {
         txtdefensa1.setVisibility(View.VISIBLE);
         txtdefensa4.setVisibility(View.VISIBLE);
         txtdefensa5.setVisibility(View.VISIBLE);
-}
+        listaJugadoresPartido.remove(txtmedio1);
+        listaJugadoresPartido.remove(txtdefensa2);
+        listaJugadoresPartido.remove(txtdefensa3);
+    }
 
 }

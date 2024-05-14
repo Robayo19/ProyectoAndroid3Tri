@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.tfgpruebita.MainActivity;
 import com.example.tfgpruebita.R;
@@ -33,6 +34,7 @@ import com.example.tfgpruebita.ui.equipo.Equipo_manage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.net.Uri;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -64,6 +66,27 @@ public class HomeFragment extends Fragment {
 
         Button btnCerrarSesion = root.findViewById(R.id.btnCerrarSesion);
         Button btnSoporte = root.findViewById(R.id.btnSoporte);
+        Button btnCrud = root.findViewById(R.id.btnCrud);
+        textView = root.findViewById(R.id.textView);
+
+        Log.d("ID Usuario", user.getUid());
+
+        if (!user.getUid().equals("WPJ0Wr3pRffU0PrXFUB5hetlpRq2")) {
+            btnCrud.setVisibility(View.GONE);
+            btnSoporte.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
+        } else {
+            btnCrud.setVisibility(View.VISIBLE);
+            btnSoporte.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
+            btnCrud.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Navigation.findNavController(v).navigate(R.id.navigation_friends);
+                }
+            });
+        }
+
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

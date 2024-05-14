@@ -63,6 +63,19 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="-250dp">
 
+        <Button
+            android:id="@+id/btnCrud"
+            android:layout_width="223dp"
+            android:layout_height="96dp"
+            android:text="Manejo de Usuarios"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.714" />
+
         <WebView
             android:id="@+id/webView"
             android:layout_width="412dp"
