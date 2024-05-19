@@ -41,5 +41,12 @@
         tools:layout="@layout/fragment_notifications">
     </fragment>
 
+    <fragment
+        android:id="@+id/navigation_crud_datos"
+        android:name="com.example.tfgpruebita.ui.friends.ManejoDatos"
+        android:label="@string/title_Friends"
+        tools:layout="@layout/fragment_cruddatos">
+    </fragment>
+
 
 </navigation>

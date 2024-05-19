@@ -76,6 +76,19 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.714" />
 
+        <Button
+            android:id="@+id/btnCrudEditor"
+            android:layout_width="223dp"
+            android:layout_height="96dp"
+            android:text="Manejo de Datos"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.714" />
+
         <WebView
             android:id="@+id/webView"
             android:layout_width="412dp"

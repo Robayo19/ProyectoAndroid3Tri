@@ -67,15 +67,14 @@ public class HomeFragment extends Fragment {
         Button btnCerrarSesion = root.findViewById(R.id.btnCerrarSesion);
         Button btnSoporte = root.findViewById(R.id.btnSoporte);
         Button btnCrud = root.findViewById(R.id.btnCrud);
+        Button btnCrudEditor = root.findViewById(R.id.btnCrudEditor);
         textView = root.findViewById(R.id.textView);
 
         Log.d("ID Usuario", user.getUid());
 
-        if (!user.getUid().equals("WPJ0Wr3pRffU0PrXFUB5hetlpRq2")) {
-            btnCrud.setVisibility(View.GONE);
-            btnSoporte.setVisibility(View.VISIBLE);
-            textView.setVisibility(View.VISIBLE);
-        } else {
+        //ID editor = RlgCxieYVRZHAan9IDiTMaWU96g2
+
+        if (user.getUid().equals("WPJ0Wr3pRffU0PrXFUB5hetlpRq2")) {
             btnCrud.setVisibility(View.VISIBLE);
             btnSoporte.setVisibility(View.GONE);
             textView.setVisibility(View.GONE);
@@ -85,6 +84,21 @@ public class HomeFragment extends Fragment {
                     Navigation.findNavController(v).navigate(R.id.navigation_friends);
                 }
             });
+        } else if (user.getUid().equals("RlgCxieYVRZHAan9IDiTMaWU96g2")) {
+            btnCrudEditor.setVisibility(View.VISIBLE);
+            btnSoporte.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
+            btnCrudEditor.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Navigation.findNavController(v).navigate(R.id.navigation_crud_datos);
+                }
+            });
+        } else {
+            btnCrud.setVisibility(View.GONE);
+            btnCrudEditor.setVisibility(View.GONE);
+            btnSoporte.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
         }
 
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
